@@ -1,0 +1,11 @@
+*.pyc
+qn_cookie.txt
+fetch_result.txt
+fetch.log
+data*.txt
+*.jpg
+qn_rec.txt
+result.xls
+tesseract*
+tessdata
+eng.traineddata
