@@ -543,11 +543,11 @@ def parseAgentPrice(flightID,priceDic,resultDic,  html3_dict = {}) :
 
 #遍历query_data_list依次调用get_price获得价格信息 
 def do_fetch(th_obj = None):
-    #if util_common.detect_network() :
-    #    log("Network not OK")
-    #    if qncfg.gui:
-    #        util_common.send_gui_cmd("fetch_finish")
-    #    return
+    if util_common.detect_network() :
+        log("Network not OK")
+        if qncfg.gui:
+            util_common.send_gui_cmd("fetch_finish")
+        return
     if th_obj :
         util_common.thread_obj = th_obj
     #读取配置

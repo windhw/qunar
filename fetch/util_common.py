@@ -201,20 +201,16 @@ def read_config():
             log("adsl_freq : %d" % qncfg.adsl_freq )
             log("adsl_username  : %s" % qncfg.adsl_username )
             log("adsl_passwd    : %s" % ("*"*len(qncfg.adsl_passwd)) )
+
 def detect_network():
     try:
-        r1 = urllib2.urlopen(qncfg.access_control,timeout=6)
+        r1 = urllib2.urlopen(qncfg.detect_url,timeout=6)
         f1 = r1.read()
         r1.close()
-        if "access" in f1:
-            return 0
-        else:
-            return 1
+        return 0
     except Exception, e:
-        if datetime.datetime.now() < datetime.datetime.strptime("2014-12-21","%Y-%m-%d") : 
-            return 0
-        else:
-            return 1
+        return 1
+
 if __name__ == "__main__":
     qncfg.verbose = True
     read_config()
