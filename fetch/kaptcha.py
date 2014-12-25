@@ -98,4 +98,5 @@ def kaptcha_pass():
         return False
 
 if __name__ == "__main__":
+    qncfg.verbose = True
     kaptcha_pass()
