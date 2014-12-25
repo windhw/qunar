@@ -7,6 +7,7 @@ import subprocess
 from   subprocess import Popen, PIPE
 import ConfigParser
 import os
+import sys
 import urllib2
 import datetime
 
@@ -123,20 +124,28 @@ def parse_from_excel ():
                 continue
 
 def adsl():
+
+    if "win" in sys.platform :
+        adsl_conn_cmd = ["rasdial",qncfg.adsl_entryname,qncfg.adsl_username,qncfg.adsl_passwd]
+        adsl_disc_cmd = ["rasdial","/DISCONNECT"]
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = subprocess.SW_HIDE
+    else:
+        adsl_conn_cmd = ["pon", qncfg.adsl_entryname]
+        adsl_disc_cmd = ["poff"]
+        startupinfo = None
     ##Disconnect
     log("Begin to disconnect ADSL")
-    startupinfo = subprocess.STARTUPINFO()
-    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    startupinfo.wShowWindow = subprocess.SW_HIDE
     retry_cnt = 0
-    p_ras = Popen(["rasdial","/DISCONNECT"], stdout=PIPE,stderr=PIPE,startupinfo=startupinfo )
+    p_ras = Popen(adsl_disc_cmd, stdout=PIPE,stderr=PIPE,startupinfo=startupinfo )
     p_ras.wait()
     p_ras.stdout.read()
     p_ras.stderr.read()
     while(p_ras.returncode and retry_cnt <3) :
         log("ADSL disconnect Fail")
         retry_cnt += 1
-        p_ras = Popen(["rasdial","/DISCONNECT"], stdout=PIPE,stderr=PIPE ,startupinfo=startupinfo)
+        p_ras = Popen(adsl_disc_cmd, stdout=PIPE,stderr=PIPE ,startupinfo=startupinfo)
         p_ras.wait()
         p_ras.stdout.read()
         p_ras.stderr.read()
@@ -146,7 +155,7 @@ def adsl():
     log("Begin to reconnect ADSL")
     ##Reconnect
     retry_cnt = 0
-    p_ras = Popen(["rasdial",qncfg.adsl_entryname,qncfg.adsl_username,qncfg.adsl_passwd], stdout=PIPE ,stderr=PIPE,startupinfo=startupinfo, shell=False)
+    p_ras = Popen(adsl_conn_cmd, stdout=PIPE ,stderr=PIPE,startupinfo=startupinfo, shell=False)
     p_ras.wait()
     p_ras.stdout.read()
     p_ras.stderr.read()
@@ -156,7 +165,7 @@ def adsl():
             log("cannot find specified ADSL entryname in system! ")
             return 2
         retry_cnt += 1
-        p_ras = Popen(["rasdial",qncfg.adsl_entryname,qncfg.adsl_username,qncfg.adsl_passwd], stdout=PIPE ,stderr = PIPE,startupinfo=startupinfo, shell=False)
+        p_ras = Popen(adsl_conn_cmd, stdout=PIPE ,stderr = PIPE,startupinfo=startupinfo, shell=False)
         p_ras.wait()
         p_ras.stdout.read()
         p_ras.stderr.read()
@@ -206,3 +215,9 @@ def detect_network():
             return 0
         else:
             return 1
+if __name__ == "__main__":
+    qncfg.verbose = True
+    read_config()
+    parse_from_excel()
+    detect_network()
+    adsl()

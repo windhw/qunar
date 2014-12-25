@@ -16,7 +16,10 @@ except:
 cookie_path      = own_dir + "/local/qn_cookie.txt"
 icon_path      = own_dir + "/local/spider.ico"
 fcfg_path        = own_dir + "/fetch.conf"
-tess_path        = own_dir + "/local/tesseract"
+if "win" in sys.platform :
+    tess_path        = own_dir + "/local/tesseract.exe"
+else :
+    tess_path        = own_dir + "/local/tesseract"
 kpic_path        = own_dir + "/local/dl.jpg"
 krec_path        = own_dir + "/local/qn_rec.txt"
 kcfg_path        = own_dir + "/local/qn_kcfg.txt"
