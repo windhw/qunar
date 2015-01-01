@@ -126,10 +126,12 @@ def get_price(query_data):
     else:
         html = f1
 
+    log_to_file(html,"%s/data.txt"  % qncfg.dbg_dir)
+
     #从返回页面html中解析出 验证js地址，SERVER_TIME等数据
     js_url = re.findall(r'\"(http://flight\.qunar\.com/twell/searchrt_ui/js/\d+)"',html)[0]
-    lwv_str =  re.findall(r"SERVER_TIME\s=\snew\sDate\(Date\.parse\('([\s\d\w:]+)'\)",html)[0]
-    lwv_dt = datetime.datetime.strptime(lwv_str,"%B %d %Y %H:%M:%S")
+    lwv_str =  re.findall(r"SERVER_TIME\s=\snew\sDate\(Date\.parse\('([\s\d\w:/]+)'\)",html)[0]
+    lwv_dt = datetime.datetime.strptime(lwv_str,"%Y/%m/%d %H:%M:%S")
     lwv  = "f" + str(int(time.mktime(lwv_dt.timetuple())*1000))
 
     #准备获取 验证js代码
@@ -148,6 +150,7 @@ def get_price(query_data):
     else:
         js_source = f_js
 
+    log_to_file(js_source,"%s/js.txt"  % qncfg.dbg_dir)
     #访问allocateCookie页面，更新cookie
     req2 = urllib2.Request("http://www.qunar.com/twell/cookie/allocateCookie.jsp",
                                     None,qncfg.htmReq_headers)
@@ -201,7 +204,7 @@ def get_price(query_data):
     else:
         html3 = f3
 
-    log_to_file(html3,"%s/data.txt"  % qncfg.dbg_dir)
+    log_to_file(html3,"%s/data3.txt"  % qncfg.dbg_dir)
     #如果遇到验证码，调用验证码模块
     if "isLimit" in html3:
         kaptcha.kaptcha_pass()
@@ -696,3 +699,13 @@ def wrap_result(resultDic, tm_total ,  req_time):
                             "Excute_Result" : "SUCCESS"
                     }
                 }
+if __name__ == "__main__":
+    util_common.read_config()
+    qncfg.verbose = True
+    qncfg.logging = True
+    qncfg.debug = True
+    query_data = {"DepartureAirport":"PEK",
+                  "ArrivalAirport":"PVG",
+                  "DepartureTime":"2015-02-01"}
+    res = get_price(query_data)
+    print res
